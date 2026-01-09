@@ -57,7 +57,7 @@ export function TodoItem({
           className="checkbox"
           type="checkbox"
           checked={Boolean(todo.completed)}
-          onChange={(e) => onToggle(todo, e.target.checked)}
+          onChange={() => onToggle(todo)}
           disabled={disableActions}
           aria-label={`Mark "${todo.title}" as ${todo.completed ? "incomplete" : "complete"}`}
         />

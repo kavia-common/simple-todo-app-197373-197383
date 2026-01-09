@@ -1,9 +1,15 @@
 /**
  * API client for Todo backend.
  * Uses fetch with JSON and consistent error parsing.
+ *
+ * Important:
+ * - Backend routes are mounted under /api/todos
+ * - Toggle endpoint is PATCH /api/todos/{id}/toggle (no request body)
+ * - PUT /api/todos/{id} requires BOTH {title, completed}
  */
 
 const DEFAULT_BASE_URL = "http://localhost:3001";
+const API_PREFIX = "/api/todos";
 
 function getApiBaseUrl() {
   // CRA exposes env vars at build time. Keep a safe fallback for local dev.
@@ -62,40 +68,45 @@ async function request(path, options = {}) {
 // PUBLIC_INTERFACE
 export async function listTodos() {
   /** Fetch all todos. Returns array of todos. */
-  return request("/todos", { method: "GET" });
+  return request(`${API_PREFIX}`, { method: "GET" });
 }
 
 // PUBLIC_INTERFACE
 export async function createTodo({ title }) {
   /** Create a new todo. Expects {title}. Returns created todo. */
-  return request("/todos", {
+  return request(`${API_PREFIX}`, {
     method: "POST",
     body: JSON.stringify({ title })
   });
 }
 
 // PUBLIC_INTERFACE
-export async function updateTodo(id, { title }) {
-  /** Update todo title. Returns updated todo. */
-  return request(`/todos/${encodeURIComponent(id)}`, {
+export async function updateTodo(id, { title, completed }) {
+  /**
+   * Update todo. Backend uses PUT and requires BOTH title and completed.
+   * Returns updated todo.
+   */
+  return request(`${API_PREFIX}/${encodeURIComponent(id)}`, {
     method: "PUT",
-    body: JSON.stringify({ title })
+    body: JSON.stringify({ title, completed })
   });
 }
 
 // PUBLIC_INTERFACE
-export async function toggleTodo(id, completed) {
-  /** Toggle completion status. Returns updated todo. */
-  return request(`/todos/${encodeURIComponent(id)}`, {
-    method: "PATCH",
-    body: JSON.stringify({ completed })
+export async function toggleTodo(id) {
+  /**
+   * Toggle completion status. Backend is PATCH /api/todos/{id}/toggle and
+   * ignores any request body (we send none).
+   */
+  return request(`${API_PREFIX}/${encodeURIComponent(id)}/toggle`, {
+    method: "PATCH"
   });
 }
 
 // PUBLIC_INTERFACE
 export async function deleteTodo(id) {
   /** Delete a todo. Returns null or backend response. */
-  return request(`/todos/${encodeURIComponent(id)}`, { method: "DELETE" });
+  return request(`${API_PREFIX}/${encodeURIComponent(id)}`, { method: "DELETE" });
 }
 
 // PUBLIC_INTERFACE

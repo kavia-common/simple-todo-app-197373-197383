@@ -40,16 +40,17 @@ export function TodosPage() {
     });
   };
 
-  const handleToggle = async (todo, completed) => {
+  const handleToggle = async (todo) => {
     return runMutation(async () => {
-      const updated = await toggleTodo(todo.id, completed);
+      const updated = await toggleTodo(todo.id);
       setTodos((prev) => prev.map((t) => (t.id === todo.id ? updated : t)));
     });
   };
 
   const handleRename = async (todo, title) => {
     return runMutation(async () => {
-      const updated = await updateTodo(todo.id, { title });
+      // Backend's PUT requires both fields.
+      const updated = await updateTodo(todo.id, { title, completed: Boolean(todo.completed) });
       setTodos((prev) => prev.map((t) => (t.id === todo.id ? updated : t)));
     });
   };
